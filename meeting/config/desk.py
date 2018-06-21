@@ -6,7 +6,7 @@ def get_data():
         {
             "label": _("Tools"),
             "icon": "octicon octicon-briefcase",
-            "items":[
+            "items": [
                 {
                     "type": "doctype",
                     "name": "Meeting",

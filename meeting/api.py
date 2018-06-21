@@ -16,10 +16,10 @@ def send_invitation_emails(meeting):
             message=meeting.invitation_message,
             reference_doctype=meeting.doctype,
             reference_name=meeting.name,
-            as_bulk=true
+
         )
 
-        meeting_status= "Invitation Sent"
+        meeting.status= "Invitation Sent"
         meeting.save()
 
 
@@ -33,27 +33,27 @@ def send_invitation_emails(meeting):
 @frappe.whitelist()
 def get_meetings(start, end):
     if not frappe.has_permission("Meeting", "read"):
-        raise frappe.permissionErr
+        raise frappe.permissionError
 
     return frappe.db.sql("""select 
-        timestamp('date',from_time) as start,
-        timestamp('date', to_time) as end,
-        name,                                                                                                                        ,
+        timestamp(`date`,from_time) as start,
+        timestamp(`date`, to_time) as end,
+        name,                                                                                                                      ,
         title,
-        status
-        0 as all_day,
-    from 'tabMeeting'
-    where 'date' between %(start)s and %(end)s""",{
+        status,
+        0 as all_day
+    from `tabMeeting`
+    where `date` between %(start)s and %(end)s""",{
         "start": start,
-        "end":end
-    }, as_dict=true)    
+        "end": end
+    }, as_dict=True)    
 
-def make_orientation_meeting(doc,method):
+def make_orientation_meeting(doc, method):
     """create an orientation meeting when a new user is added"""
     meeting = frappe.get_doc({
         "doctype": "Meeting",
-        #"title": "Orientation for {0}".format(doc.first_name),
-        "date": add_days(nowdate(),1),
+        "title": "Orientation for {0}".format(doc.first_name),
+        "date": add_days(nowdate(), 1),
         "from_time": "09:30",
         "to_time": "09:30",
         "status": "Planned",
@@ -62,7 +62,7 @@ def make_orientation_meeting(doc,method):
         }]
     })
 
-    meeting.flags.ignore_permission = True
+    meeting.flags.ignore_permissions = True
     meeting.insert() 
 
     frappe.msgprint(_("Orientation meeting created"))
